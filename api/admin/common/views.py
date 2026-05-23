@@ -1,12 +1,14 @@
-from rest_framework import generics,status
-from apps.common.models import Phone,PhoneImage
-
+from rest_framework import generics, status
+from apps.common.models import Phone, PhoneImage
 from rest_framework.views import APIView
 from rest_framework.response import Response
-
+from rest_framework.permissions import AllowAny
+from api.permissions import IsAdminRole
 
 
 class PhoneListCreateAPIView(APIView):
+    permission_classes = [IsAdminRole]
+
     def get(self, request):
         phones = Phone.objects.prefetch_related('images').all()
 
@@ -25,7 +27,7 @@ class PhoneListCreateAPIView(APIView):
 
         return Response({"status": "success", "data": data}, status=status.HTTP_200_OK)
 
-    def post(self,  request):
+    def post(self, request):
         title = request.data.get('title')
         images = request.FILES.getlist('images')
 
@@ -53,13 +55,16 @@ class PhoneListCreateAPIView(APIView):
 
 class PhoneRetrieveDestroyAPIView(APIView):
 
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAdminRole()]
+
     def get_object(self, pk):
-        # slug = self.request.GET.get('slug')
         try:
             return Phone.objects.prefetch_related('images').get(pk=pk)
         except Phone.DoesNotExist:
             return None
-
 
     def get(self, request, pk):
         phone = self.get_object(pk)
@@ -83,7 +88,6 @@ class PhoneRetrieveDestroyAPIView(APIView):
 
         return Response({"status": "success", "data": data}, status=status.HTTP_200_OK)
 
-
     def delete(self, request, pk):
         phone = self.get_object(pk)
 
@@ -99,9 +103,3 @@ class PhoneRetrieveDestroyAPIView(APIView):
             "status": "success",
             "message": f"ID: {pk} telefon o'chirildi."
         }, status=status.HTTP_200_OK)
-
-
-
-
-
-

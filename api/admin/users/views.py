@@ -52,7 +52,7 @@ class LoginAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         user = authenticate(username=username, password=password)
-        if not user:                                        # ← o'zgartirildi
+        if not user:
             return Response({
                 "detail": "Username yoki parol xato!"
             }, status=status.HTTP_401_UNAUTHORIZED)
@@ -94,7 +94,7 @@ class LogoutAPIView(APIView):
         refresh_token = request.data.get('refresh')
         if not refresh_token:
             return Response({
-                "detail": "Refresh token Authorization Headers ichida Bearer bo'lib kelishi shart!"
+                "detail": "refresh token Authorization Headers ichida Bearer bo'lib kelishi shart!"
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
